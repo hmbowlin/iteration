@@ -280,3 +280,31 @@ dynamite_reviews = bind_rows(
 dynamite_reviews
 ```
 
+
+```{r}
+x = rnorm(25, 0, 1)
+
+my_summary = function(x, summ_func) {
+  summ_func(x)
+}
+
+my_summary(x, sd)
+
+my_summary(x, IQR)
+
+my_summary(x, var)
+```
+
+## Make sure you define your function and dont use a variable called the same thing!
+```{r}
+f = function(x) {
+  z = x + y
+  z
+}
+
+x = 1
+y = 2
+
+f(x = y)
+```
+
