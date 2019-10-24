@@ -34,9 +34,9 @@ z_scores(x)
 # Creating the function
 
 ```{r}
-z_scores = function(x) {
+z_scores = function(x_arg) {
   
-  z = (x - mean(x)) / sd(x)
+  z = (x_arg - mean(x_arg)) / sd(x_arg)
   z
   
 }
@@ -45,33 +45,106 @@ z_scores(x)
 ```
 
 ```{r}
-z_scores(x = x)
+z_scores(x_arg = x)
 
-z_scores(x = y)
+z_scores(x_arg = y)
 ```
 
 
 ```{r}
 # doesnt work always for charcter vectors or factors
-z_scores(x = 3)
+z_scores(x_arg = 3)
 # z_scores(x = "my name is hannah")
-z_scores(x = c(TRUE, TRUE , FALSE, TRUE))
+z_scores(x_arg = c(TRUE, TRUE , FALSE, TRUE))
 ```
 
 # Conditional execution
 
 ```{r}
-z_scores = function(x) {
+z_scores = function(x_arg) {
   
-  if (!is.numeric(x)) {
+  if (!is.numeric(x_arg)) {
     stop("Argument x should be numeric")
-  } else if (length(x) == 1) {
+  } else if (length(x_arg) == 1) {
     stop("Z scores cannot be computed for length 1 vectors")
   }
   
   z = mean(x) / sd(x)
   
   z
+}
+```
+
+## Multiple outputs
+
+```{r}
+mean_and_sd = function(x_arg) {
+  
+  if (!is.numeric(x_arg)) {
+    stop("Argument x should be numeric")
+  } else if (length(x_arg) == 1) {
+    stop("Cannot be computed for length 1 vectors")
+  }
+  
+  mean_x = mean(x_arg)
+  sd_x = sd(x_arg)
+
+  list(mean = mean_x, 
+       sd = sd_x)
+}
+```
+
+```{r}
+mean_and_sd = function(x_arg) {
+  
+  if (!is.numeric(x_arg)) {
+    stop("Argument x should be numeric")
+  } else if (length(x_arg) < 3) {
+    stop("x should be longer than 3")
+  }
+  
+  mean_x = mean(x_arg)
+  sd_x = sd(x_arg)
+
+  list(mean = mean_x, 
+       sd = sd_x)
+}
+```
+
+
+```{r}
+mean_and_sd = function(x_arg) {
+  
+  if (!is.numeric(x_arg)) {
+    stop("Argument x should be numeric")
+  } else if (length(x_arg) < 3) {
+    stop("x should be longer than 3")
+  }
+  
+  mean_x = mean(x_arg)
+  sd_x = sd(x_arg)
+
+  list(mean = mean_x, 
+       sd = sd_x,
+       z_scores = (x_arg - mean(x_arg)) / sd(x_arg))
+}
+```
+```{r}
+mean_and_sd = function(x_arg) {
+  
+  if (!is.numeric(x_arg)) {
+    stop("Argument x should be numeric")
+  } else if (length(x_arg) == 1) {
+    stop("Cannot be computed for length 1 vectors")
+  }
+  
+  mean_x = mean(x_arg)
+  sd_x = sd(x_arg)
+
+  tibble(
+    mean = mean_x, 
+    sd = sd_x
+  )
 }
 ```
 
