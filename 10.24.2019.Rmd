@@ -166,13 +166,13 @@ sim_data %>%
   ggplot(aes(x = x, y = y)) + 
   geom_point()
 ```
-
+## Here we have set beta 1 and beta0 by default
 ```{r}
 sim_regression = function(n, beta0 = 2, beta1 = 3) {
   
   sim_data = tibble(
     x = rnorm(n, mean = 1, sd = 1),
-    y = 2 + 3 * x + rnorm(n, 0, 1)
+    y = beta0 + beta1 * x + rnorm(n, 0, 1)
   )
   
   ls_fit = lm(y ~ x, data = sim_data)
@@ -182,10 +182,101 @@ sim_regression = function(n, beta0 = 2, beta1 = 3) {
     beta1_hat = coef(ls_fit)[2]
   )
 }
+sim_regression(n = 100, beta0 = 23)
 ```
 
 ```{r}
 sim_regression(n = 30)
 sim_regression(n = 3000)
+```
+
+# Now we're having users put in beta0 and beta1 into the function
+```{r}
+sim_regression = function(n, beta0, beta1) {
+  
+  sim_data = tibble(
+    x = rnorm(n, mean = 1, sd = 1),
+    y = beta0 + beta1 * x + rnorm(n, 0, 1)
+  )
+  
+  ls_fit = lm(y ~ x, data = sim_data)
+  
+  tibble(
+    beta0_hat = coef(ls_fit)[1],
+    beta1_hat = coef(ls_fit)[2]
+  )
+}
+
+sim_regression(n = 30, beta0 = 17, beta1 = -3)
+sim_regression(n = 3000, beta0 = 24, beta1 = 3)
+
+```
+
+# reading in data from the web and creating a function from that
+```{r}
+url = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviewerType=avp_only_reviews&sortBy=recent&pageNumber=1"
+
+dynamite_html = read_html(url)
+
+review_titles = dynamite_html %>%
+  html_nodes("#cm_cr-review_list .review-title") %>%
+  html_text()
+
+review_stars = dynamite_html %>%
+  html_nodes("#cm_cr-review_list .review-rating") %>%
+  html_text()
+
+review_text = dynamite_html %>%
+    html_nodes(".review-data:nth-child(4)") %>%
+    html_text()
+
+reviews = tibble(
+  title = review_titles,
+  stars = review_stars,
+  text = review_text
+)
+```
+
+
+```{r}
+read_page_reviews <- function(url) {
+  
+  h = read_html(url)
+  
+  review_titles = h %>%
+    html_nodes("#cm_cr-review_list .review-title") %>%
+    html_text()
+  
+  review_stars = h %>%
+    html_nodes("#cm_cr-review_list .review-rating") %>%
+    html_text() %>%
+    str_extract("\\d") %>%
+    as.numeric()
+  
+  review_text = h %>%
+    html_nodes(".review-data:nth-child(4)") %>%
+    html_text()
+  
+  tibble(
+    title = review_titles,
+    stars = review_stars,
+    text = review_text
+  )
+}
+```
+
+```{r}
+url_base = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviewerType=avp_only_reviews&sortBy=recent&pageNumber="
+vec_urls = str_c(url_base, 1:5)
+
+dynamite_reviews = bind_rows(
+  read_page_reviews(vec_urls[1]),
+  read_page_reviews(vec_urls[2]),
+  read_page_reviews(vec_urls[3]),
+  read_page_reviews(vec_urls[4]),
+  read_page_reviews(vec_urls[5])
+)
+
+dynamite_reviews
 ```
 
