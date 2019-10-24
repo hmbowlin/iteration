@@ -1,0 +1,77 @@
+---
+title: "iteration"
+author: "Hannah Bowlin"
+date: "10/24/2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(rvest)
+set.seed(1)
+
+```
+
+# Get Started
+
+```{r}
+x = rnorm(30, mean = 4, sd = 2.3)
+x_again = rnorm(25, mean = 4, sd = 2.5)
+y = rnorm(20, mean = 5, sd = 2)
+
+# z scores for this vector
+z_scores = function(x) {
+  
+  z = (x - mean(x)) / sd(x)
+  z
+  
+}
+
+z_scores(x)
+```
+
+# Creating the function
+
+```{r}
+z_scores = function(x) {
+  
+  z = (x - mean(x)) / sd(x)
+  z
+  
+}
+
+z_scores(x)
+```
+
+```{r}
+z_scores(x = x)
+
+z_scores(x = y)
+```
+
+
+```{r}
+# doesnt work always for charcter vectors or factors
+z_scores(x = 3)
+# z_scores(x = "my name is hannah")
+z_scores(x = c(TRUE, TRUE , FALSE, TRUE))
+```
+
+# Conditional execution
+
+```{r}
+z_scores = function(x) {
+  
+  if (!is.numeric(x)) {
+    stop("Argument x should be numeric")
+  } else if (length(x) == 1) {
+    stop("Z scores cannot be computed for length 1 vectors")
+  }
+  
+  z = mean(x) / sd(x)
+  
+  z
+}
+```
+
