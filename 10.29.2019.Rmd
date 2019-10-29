@@ -1,0 +1,154 @@
+---
+title: "10.29.2019"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+
+library(tidyverse)
+library(dplyr)
+library(rvest)
+set.seed(1)
+```
+
+```{r}
+l = list(vec_numeric = 5:8,
+         mat         = matrix(1:8, 2, 4),
+         vec_logical = c(TRUE, FALSE),
+         summary     = summary(rnorm(1000)))
+l
+```
+```{r}
+l$vec_numeric
+l[[1]]
+l[[1]][1:3]
+
+df = tibble(
+  a = rnorm(20, 3, 1),
+  b = rnorm(20, 0, 5),
+  c = rnorm(20, 10, .2),
+  d = rnorm(20, -3, 1)
+)
+
+is.list(df)
+```
+
+## Function from last time
+```{r}
+mean_and_sd = function(x) {
+  
+  if (!is.numeric(x)) {
+    stop("Argument x should be numeric")
+  } else if (length(x) == 1) {
+    stop("Cannot be computed for length 1 vectors")
+  }
+  
+  mean_x = mean(x)
+  sd_x = sd(x)
+
+  tibble(
+    mean = mean_x, 
+    sd = sd_x
+  )
+}
+```
+
+## Creating a list for output
+```{r}
+output = vector("list", length = 4)
+```
+
+# For loop
+```{r}
+output = vector("list", length = 4)
+
+## For the function i in our vector 1 through 4, iterate over if it's the object 1,2,3 or 4
+for (i in 1:4) {
+  output[[i]] = mean_and_sd(df[[i]])
+}
+
+# Shows the mean and st dev of each of the outputs we made above
+output 
+```
+
+## Changing for loop into map statement
+```{r}
+
+## this is my input, for each input i want mean and sd, and that's what i want as my output (map over my intput and get the output I'm interested in)
+output = map(df, mean_and_sd)
+
+output = map_df(.x = df, ~ mean_and_sd(.x))
+
+output = vector("list", length = 4)
+
+for (i in 1:4) {
+  output[[i]] = median(df[[i]])
+}
+
+output = map(df, median)
+```
+
+```{r}
+
+output_summary = map(df, summary)
+
+output_median = map_dbl(df, median)
+output = map_dfr(df, mean_and_sd)
+
+```
+
+## Revisiting Napoleon
+```{r} 
+read_page_reviews = function(url) {
+  
+  h = read_html(url)
+  
+  title = h %>%
+    html_nodes("#cm_cr-review_list .review-title") %>%
+    html_text()
+  
+  stars = h %>%
+    html_nodes("#cm_cr-review_list .review-rating") %>%
+    html_text() %>%
+    str_extract("\\d") %>%
+    as.numeric()
+  
+  text = h %>%
+    html_nodes(".review-data:nth-child(5)") %>%
+    html_text()
+  
+  data_frame(title, stars, text)
+}
+
+## Creating vector of Url's
+
+url_base = "https://www.amazon.com/product-reviews/B00005JNBQ/ref=cm_cr_arp_d_viewopt_rvwer?ie=UTF8&reviewerType=avp_only_reviews&sortBy=recent&pageNumber="
+vec_urls = str_c(url_base, 1:5)
+
+## COuld do this 5 times to show each page but we want to make a list
+read_page_reviews(vec_urls[[1]])
+
+##Making a list to get each page of reviews
+
+output = vector("list", length = 5)
+
+# for each page 1 through 5, read the page reviews (function we created last time), create a vector of the urls to show reviews from each page (we get 5 tibbles with reviews from each page WOOOOO)
+for (i in 1:5) {
+  output[[i]] = read_page_reviews(vec_urls[[i]])
+}
+ output
+``` 
+
+```{r}
+output = vector("list", 5)
+
+for (i in 1:5) {
+  output[[i]] = read_page_reviews(vec_urls[[i]])
+}
+
+dynamite_reviews = bind_rows(output)
+
+dynamite_reviews = map_df(vec_urls, read_page_reviews)
+```
+
